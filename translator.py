@@ -28,9 +28,10 @@ def load_glossary():
 
     try:
         from sheets import get_sheet
+
         sheet = get_sheet(GLOSSARY_SHEET)
 
-        # ✅ 용어집 A:B만 읽기
+        # ✅ A:B만 읽기
         values = sheet.get("A:B")
 
     except Exception as e:
@@ -40,26 +41,28 @@ def load_glossary():
 
     glossary = []
 
-    # 1행은 헤더라고 보고 제외
+    # 1행 헤더 제외
     for row in values[1:]:
         if len(row) < 2:
             continue
 
-        source = str(row[0]).strip()
-        target = str(row[1]).strip()
+        korean = str(row[0]).strip()
+        english = str(row[1]).strip()
 
-        if not source or not target:
+        if not korean or not english:
             continue
 
+        # 🔥 영어 → 한국어 방향
         glossary.append({
-            "source": source,
-            "target": target,
+            "source": english,
+            "target": korean,
         })
 
-    # 긴 용어 우선 치환
+    # 긴 용어 우선
     glossary.sort(key=lambda x: len(x["source"]), reverse=True)
 
     _glossary_cache = glossary
+
     print(f"용어집 로드 완료(A:B): {len(glossary)}개")
 
     return _glossary_cache
