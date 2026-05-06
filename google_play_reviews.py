@@ -53,7 +53,10 @@ def collect_reviews():
 
         for r in result:
             review_id = r.get("reviewId", "")
-            if review_id and review_id in seen:
+            if review_id and (
+                review_id in seen or
+                review_id in existing_ids
+            ):
                 continue
             seen.add(review_id)
 
