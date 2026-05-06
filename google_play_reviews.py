@@ -102,4 +102,7 @@ def collect_reviews():
             else:
                 rows_neu.append(row)
 
+    print(f"기존 리뷰 제외 수: {len(existing_ids)}")
+    print(f"이번 실행 신규 리뷰 수: {len(rows_all)}")
+
     return rows_all, rows_pos, rows_neg, rows_neu
