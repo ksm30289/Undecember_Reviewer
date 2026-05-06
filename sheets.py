@@ -27,3 +27,12 @@ def append_rows(sheet_name, rows):
     sheet = get_sheet(sheet_name)
     if rows:
         sheet.append_rows(rows, value_input_option="USER_ENTERED")
+
+
+def get_existing_review_ids(sheet_name):
+    sheet = get_sheet(sheet_name)
+
+    values = sheet.col_values(9)  # 리뷰 ID 컬럼 (I열)
+
+    # 헤더 제외
+    return set(v.strip() for v in values[1:] if v.strip())
