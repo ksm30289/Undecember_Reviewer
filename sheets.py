@@ -18,6 +18,11 @@ def get_sheet(name):
     return client.open_by_key(SPREADSHEET_ID).worksheet(name)
 
 
+def get_records(sheet_name):
+    sheet = get_sheet(sheet_name)
+    return sheet.get_all_records()
+
+
 def append_rows(sheet_name, rows):
     sheet = get_sheet(sheet_name)
     if rows:
