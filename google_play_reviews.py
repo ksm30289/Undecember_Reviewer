@@ -3,6 +3,7 @@ from datetime import datetime
 
 from config import APP_ID, START_DATE
 from translator import translate_text
+from sheets import get_existing_review_ids
 
 
 START_DT = datetime.strptime(START_DATE, "%Y-%m-%d")
