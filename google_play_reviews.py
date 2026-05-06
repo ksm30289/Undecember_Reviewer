@@ -39,6 +39,8 @@ def collect_reviews():
     rows_neg = []
     rows_neu = []
 
+    existing_ids = get_existing_review_ids("구글플레이 리뷰")
+
     seen = set()
 
     for setting in review_sets:
