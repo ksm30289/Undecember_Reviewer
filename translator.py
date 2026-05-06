@@ -27,7 +27,12 @@ def load_glossary():
         return _glossary_cache
 
     try:
-        records = get_records(GLOSSARY_SHEET)
+        from sheets import get_sheet
+        sheet = get_sheet(GLOSSARY_SHEET)
+
+        # ✅ 용어집 A:B만 읽기
+        values = sheet.get("A:B")
+
     except Exception as e:
         print("용어집 로드 실패:", e)
         _glossary_cache = []
@@ -35,9 +40,13 @@ def load_glossary():
 
     glossary = []
 
-    for row in records:
-        source = str(row.get("원문", "")).strip()
-        target = str(row.get("번역", "")).strip()
+    # 1행은 헤더라고 보고 제외
+    for row in values[1:]:
+        if len(row) < 2:
+            continue
+
+        source = str(row[0]).strip()
+        target = str(row[1]).strip()
 
         if not source or not target:
             continue
@@ -51,7 +60,7 @@ def load_glossary():
     glossary.sort(key=lambda x: len(x["source"]), reverse=True)
 
     _glossary_cache = glossary
-    print(f"용어집 로드 완료: {len(glossary)}개")
+    print(f"용어집 로드 완료(A:B): {len(glossary)}개")
 
     return _glossary_cache
 
