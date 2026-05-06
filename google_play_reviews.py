@@ -16,55 +16,84 @@ def classify(score):
     return "긍정"
 
 
-def collect_reviews():
+def fetch_reviews(lang, country, count=200):
     result, _ = reviews(
         APP_ID,
-        lang="en",
-        country="us",
+        lang=lang,
+        country=country,
         sort=Sort.NEWEST,
-        count=200
+        count=count
     )
+    return result
+
+
+def collect_reviews():
+    review_sets = [
+        {"lang": "ko", "country": "kr"},
+        {"lang": "en", "country": "us"},
+    ]
 
     rows_all = []
     rows_pos = []
     rows_neg = []
     rows_neu = []
 
-    for r in result:
-        created = r["at"]
+    seen = set()
 
-        if created < START_DT:
-            continue
+    for setting in review_sets:
+        lang = setting["lang"]
+        country = setting["country"]
 
-        score = r["score"]
-        content = r["content"]
-        user = r["userName"]
+        print(f"리뷰 수집 중: lang={lang}, country={country}")
 
-        lang = "en"
+        result = fetch_reviews(lang, country)
 
-        # 번역
-        translated = translate_text(content, "ko")
+        for r in result:
+            review_id = r.get("reviewId", "")
+            if review_id and review_id in seen:
+                continue
+            seen.add(review_id)
 
-        category = classify(score)
+            created = r.get("at")
+            if not created or created < START_DT:
+                continue
 
-        row = [
-            datetime.now().strftime("%Y-%m-%d"),
-            created.strftime("%Y-%m-%d"),
-            lang,
-            score,
-            category,
-            user,
-            content,
-            translated,
-        ]
+            score = r.get("score", 0)
+            content = str(r.get("content", "")).strip()
+            user = str(r.get("userName", "")).strip()
+            app_version = str(r.get("reviewCreatedVersion", "") or "").strip()
 
-        rows_all.append(row)
+            if not content:
+                continue
 
-        if category == "긍정":
-            rows_pos.append(row)
-        elif category == "부정":
-            rows_neg.append(row)
-        else:
-            rows_neu.append(row)
+            category = classify(score)
+
+            # 한국어는 원문 그대로, 영어는 한국어 번역
+            if lang == "en":
+                translated = translate_text(content, "ko")
+            else:
+                translated = content
+
+            row = [
+                datetime.now().strftime("%Y-%m-%d"),
+                created.strftime("%Y-%m-%d"),
+                lang,
+                score,
+                category,
+                user,
+                content,
+                translated,
+                review_id,
+                app_version,
+            ]
+
+            rows_all.append(row)
+
+            if category == "긍정":
+                rows_pos.append(row)
+            elif category == "부정":
+                rows_neg.append(row)
+            else:
+                rows_neu.append(row)
 
     return rows_all, rows_pos, rows_neg, rows_neu
