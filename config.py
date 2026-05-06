@@ -16,5 +16,8 @@ APP_ID = required("GOOGLE_PLAY_APP_ID")
 
 START_DATE = os.getenv("GP_REVIEW_START_DATE", "2026-01-01")
 
-# 번역
+# 번역 사용 여부
 USE_TRANSLATE = True
+
+# ✅ 용어집 시트 (추가)
+GLOSSARY_SHEET = os.getenv("GLOSSARY_SHEET", "용어집")
